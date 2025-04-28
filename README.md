@@ -33,16 +33,6 @@ This project implements and evaluates two state-of-the-art algorithms:
 - Achieves orders of magnitude performance improvement while preserving solution optimality
 - Time complexity: O(k·m·log n) where k is the core number, significantly faster for large graphs
 
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/dense-subgraph-detection.git
-cd dense-subgraph-detection
-
-# Ensure you have the required dependencies
-sudo apt-get install build-essential g++ cmake
-```
 
 ## Compilation Instructions
 
@@ -175,18 +165,3 @@ The repository includes visualization tools for:
 - **Meghaditya Giri**: Algorithm visualization, CoreExact debugging, and compiled the project report
 - **Karan Sethia**: Debugging of Exact Algorithm and documentation
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Citation
-
-If you use this code in your research, please cite:
-```
-@software{dense_subgraph_detection,
-  author = {Patil, Om and Maheshwari, Kartik and Modi, Jinesh and Giri, Meghaditya and Sethia, Karan},
-  title = {Dense Subgraph Detection Algorithms},
-  year = {2025},
-  url = {https://github.com/your-username/dense-subgraph-detection}
-}
-```
