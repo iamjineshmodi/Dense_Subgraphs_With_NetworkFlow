@@ -68,8 +68,8 @@ The algorithms were evaluated on four real-world network datasets:
 
 ## Contributors
 
-- Om Patil
-- Kartik Maheshwari
-- Jinesh Modi
-- Karan Sethia
-- Meghaditya Giri
+- Om Patil : Implementation of Exact Algorithm and Website Developer
+- Kartik Maheshwari : Implementation of Exact and CoreExact Algorithm
+- Jinesh Modi : Implementation of CoreExact Algorithm and Website UI Designer
+- Meghaditya Giri : Made a visualization of all the algorithms and also debugging the code of CoreExact Algorithm on the website and also wrote a combined report on the algorithms
+- Karan Sethia : Debugging the code of Exact Algorithm and also wrote a readme of all the algorithms
