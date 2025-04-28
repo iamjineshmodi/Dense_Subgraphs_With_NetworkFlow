@@ -2,14 +2,103 @@
 using namespace std;
 using namespace std::chrono;
 
+unordered_map<int, vector<unordered_set<int>>> sizetocliques;
+
 struct Edge
 {
     int to, rev;
     double cap, flow;
 };
 
+void PrintCliques()
+{
+    for(const auto& size : sizetocliques)
+    {
+        cout << "----------------------" << endl << "Size: " << size.first << endl;
+        for(const auto& clique : size.second)
+        {
+            cout << "{";
+            for(int v : clique)
+            {
+                cout << " " << v << " ";
+            }
+            cout << "}" << endl;
+        }
+        cout << "----------------------" << endl;
+    }
+}
+
+bool CheckClique(const unordered_set<int>& clique, vector<vector<int>>& adj)
+{
+    for(auto u : clique)
+    {
+        for(auto v : clique)
+        {
+            if(u != v)
+            {
+                if(find(adj[u].begin(), adj[u].end(), v) == adj[u].end())
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 class Dinic
 {
+    private:
+    int n;
+    vector<vector<Edge>> adj;
+    vector<int> dist, ptr;
+    const double INF = numeric_limits<double>::max() / 2.0;
+
+    bool BFS(int source, int sink)
+    {
+        fill(dist.begin(), dist.end(), -1);
+        dist[source] = 0;
+        queue<int> q;
+        q.push(source);
+        while(!q.empty())
+        {
+            int u = q.front();
+            q.pop();
+            for(auto& edge : adj[u])
+            {
+                if(edge.cap > edge.flow && dist[edge.to] == -1)
+                {
+                    dist[edge.to] = dist[u] + 1;
+                    q.push(edge.to);
+                }
+            }
+        }
+        return dist[sink] != -1;
+    }
+
+    double DFS(int u, int sink, double flow)
+    {
+        if(u == sink)
+        {
+            return flow;
+        }
+        for(int& i = ptr[u]; i < adj[u].size(); i++)
+        {
+            Edge& edge = adj[u][i];
+            if(edge.cap > edge.flow && dist[edge.to] == dist[u] + 1)
+            {
+                double pushed = DFS(edge.to, sink, min(flow, edge.cap - edge.flow));
+                if(pushed > 0)
+                {
+                    edge.flow += pushed;
+                    adj[edge.to][edge.rev].flow -= pushed;
+                    return pushed;
+                }
+            }
+        }
+        return 0.0;
+    }
+
     public:
     Dinic(int n) : n(n)
     {
@@ -82,107 +171,91 @@ class Dinic
         }
         return result;
     }
-
-    private:
-    int n;
-    vector<vector<Edge>> adj;
-    vector<int> dist, ptr;
-    const double INF = numeric_limits<double>::max() / 2.0;
-
-    bool BFS(int source, int sink)
-    {
-        fill(dist.begin(), dist.end(), -1);
-        dist[source] = 0;
-        queue<int> q;
-        q.push(source);
-        while(!q.empty())
-        {
-            int u = q.front();
-            q.pop();
-            for(auto& edge : adj[u])
-            {
-                if(edge.cap > edge.flow && dist[edge.to] == -1)
-                {
-                    dist[edge.to] = dist[u] + 1;
-                    q.push(edge.to);
-                }
-            }
-        }
-        return dist[sink] != -1;
-    }
-
-    double DFS(int u, int sink, double flow)
-    {
-        if(u == sink)
-        {
-            return flow;
-        }
-        for(int& i = ptr[u]; i < adj[u].size(); i++)
-        {
-            Edge& edge = adj[u][i];
-            if(edge.cap > edge.flow && dist[edge.to] == dist[u] + 1)
-            {
-                double pushed = DFS(edge.to, sink, min(flow, edge.cap - edge.flow));
-                if(pushed > 0)
-                {
-                    edge.flow += pushed;
-                    adj[edge.to][edge.rev].flow -= pushed;
-                    return pushed;
-                }
-            }
-        }
-        return 0.0;
-    }
 };
+
+void EnumerateAllCliques(int h, const unordered_map<int, unordered_set<int>>& adjList, const unordered_set<int>& vertices)
+{
+    sizetocliques.clear();
+    for(int v : vertices)
+    {
+        unordered_set<int> singleClique = {v};
+        sizetocliques[1].push_back(singleClique);
+    }
+    cout << "Found cliques of size: 1: " << sizetocliques[1].size() << endl;
+    
+    for(int u : vertices)
+    {
+        for(int v : adjList.at(u))
+        {
+            if(u < v)
+            {
+                unordered_set<int> clique = {u, v};
+                sizetocliques[2].push_back(clique);
+            }
+        }
+    }
+    cout << "Found cliques of size: 2: " << sizetocliques[2].size() << endl;
+
+    for(int size = 3; size < h; size++)
+    {
+        bool flag = false;
+        set<set<int>> uniqueCliques;
+        for(const auto& smallerClique : sizetocliques[size - 1])
+        {
+            int maxNode = *max_element(smallerClique.begin(), smallerClique.end());
+            for(int v : vertices){
+                if(v <= maxNode)
+                {
+                    continue;
+                }
+                bool isConnected = true;
+                for(int u : smallerClique)
+                {
+                    if(!adjList.at(v).count(u))
+                    {
+                        isConnected = false;
+                        break;
+                    }
+                }
+                if(isConnected)
+                {
+                    unordered_set<int> newClique = smallerClique;
+                    newClique.insert(v);
+                    set<int> orderedClique(newClique.begin(), newClique.end());
+                    if(uniqueCliques.insert(orderedClique).second)
+                    {
+                        sizetocliques[size].push_back(newClique);
+                        flag = true;
+                    }
+                }
+            }
+        }
+        cout << "Found cliques of size: " << size << ": " << sizetocliques[size].size() << endl;
+        if(!flag)
+        {
+            break;
+        }
+    }
+}
 
 vector<unordered_set<int>> EnumerateCliques(const vector<vector<int>>& adj, int h)
 {
-    vector<unordered_set<int>> result;
-
-    function<void(vector<int>&, int, unordered_set<int>&)> BronKerbosch = [&](vector<int>& R, int v, unordered_set<int>& P)
+    unordered_map<int, unordered_set<int>> adjList;
+    unordered_set<int> vertices;
+    for(int u=0; u < adj.size(); u++)
     {
-        if(R.size() == h-1)
-        {
-            result.push_back(unordered_set<int>(R.begin(), R.end()));
-            return;
-        }
-        vector<int> P_copy(P.begin(), P.end());
-        for(int u : P_copy)
-        {
-            if(u <= v)
-            {
-                continue;
-            }
-            R.push_back(u);
-            P.erase(u);
-            unordered_set<int> Pv;
-            for(int w : adj[u])
-            {
-                if(P.find(w) != P.end())
-                {
-                    Pv.insert(w);
-                }
-            }
-            BronKerbosch(R, u, Pv);
-            R.pop_back();
-            P.insert(u);
-        }
-    };
-
-    for(int u=0; u<adj.size(); u++)
-    {
-        vector<int> R = {u};
-        unordered_set<int> P;
-        for(int v : adj[u])
-        {
-            if(v > u)
-            {
-                P.insert(v);
-            }
-        }
-        BronKerbosch(R, u, P);
+        adjList[u] = unordered_set<int>(adj[u].begin(), adj[u].end());
+        vertices.insert(u);
     }
-    return result;
+    EnumerateAllCliques(h, adjList, vertices);
+    if(sizetocliques.find(h-1) != sizetocliques.end())
+    {
+        return sizetocliques[h-1];
+    }
+    else
+    {
+        return vector<unordered_set<int>>();
+    }
 }
 
 vector<int> ComputeCliqueDegree(int n, const vector<unordered_set<int>>& Lambda, const vector<vector<int>>& adj)
@@ -329,6 +402,23 @@ pair<double, vector<int>> EXACT(int n, int h, const vector<unordered_set<int>>& 
     return {l, D};
 }
 
+void GenerateReport(string filename, int n, int e, int h, double alpha, vector<int>& originalD, long long duration)
+{
+    cout << "---------------------------------------------" << endl;
+    cout << "Dataset: " << filename << endl;
+    cout << "Nodes: " << n << " Edges: " << e << endl;
+    cout << "H: " << h << endl;
+    cout << "Alpha: " << alpha << endl;
+    cout << "Nodes in CDS: " << originalD.size() << endl << "CDS: ";
+    for(int v : originalD)
+    {
+        cout << v << " ";
+    }
+    cout << endl;
+    cout << "Time taken: " << duration << " ms" << endl;
+    cout << "---------------------------------------------" << endl;
+}
+
 int main()
 {
     string filename;
@@ -337,6 +427,11 @@ int main()
     int h;
     cout << "Enter size of clique h: ";
     cin >> h;
+    if(h <= 1)
+    {
+        cout << "Value of H should be more than 1";
+        return 0;
+    }
     ios_base::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
@@ -398,8 +493,8 @@ int main()
     cout << "Adjacency and degree list created" << endl;
 
     vector<unordered_set<int>> Lambda = EnumerateCliques(adj, h);
+    // PrintCliques();
     cout << "Lambda set created" << endl;
-    cout << "Number of " << h-1 << "-cliques: " << Lambda.size() << endl;
 
     vector<int> CliqueDegree = ComputeCliqueDegree(n, Lambda, adj);
     cout << "Clique degree computed" << endl;
@@ -433,19 +528,7 @@ int main()
     }
     sort(originalD.begin(), originalD.end());
 
-    cout << "---------------------------------------------" << endl;
-    cout << "Dataset: " << filename << endl;
-    cout << "Nodes: " << n << " Edges: " << e << endl;
-    cout << "H: " << h << endl;
-    cout << "Alpha: " << alpha << endl;
-    cout << "Nodes in CDS: " << originalD.size() << endl << "CDS: ";
-    for(int v : originalD)
-    {
-        cout << v << " ";
-    }
-    cout << endl;
-    cout << "Time taken: " << duration.count() << " ms" << endl;
-    cout << "---------------------------------------------" << endl;
+    GenerateReport(filename, n, e, h, alpha, originalD, duration.count());
 
     return 0;
 }
