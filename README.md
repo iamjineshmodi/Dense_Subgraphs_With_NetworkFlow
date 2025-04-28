@@ -36,6 +36,11 @@ The algorithms were evaluated on four real-world network datasets:
 | Ca-hepth | 9,877 | 25,998 | 0.00053 |
 | AS-caida | 26,475 | 53,381 | 0.00015 |
 
+AS-caida: https://drive.google.com/file/d/1ZOsB_nsFdwWK4FDbBEF_7S6DfYiML2FI/view?usp=drive_link
+AS733: https://drive.google.com/file/d/1UPQD69f7VLQTl-e3kI3jUH1ecM7lOhVO/view?usp=drive_link
+Ca-hepth: https://drive.google.com/file/d/1ebJ0e3PHX_KI3vmsYKFToi1kTdsAxQ8x/view?usp=drive_link
+Netscience: https://drive.google.com/file/d/1PJCkBiPKrLOA7_TTzKsKSnbnAR9F7EIY/view?usp=drive_link
+
 ## Performance Highlights
 
 - CoreExact consistently outperforms the traditional Exact algorithm by orders of magnitude
