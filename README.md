@@ -36,10 +36,55 @@ The algorithms were evaluated on four real-world network datasets:
 | Ca-hepth | 9,877 | 25,998 | 0.00053 |
 | AS-caida | 26,475 | 53,381 | 0.00015 |
 
-AS-caida: https://drive.google.com/file/d/1ZOsB_nsFdwWK4FDbBEF_7S6DfYiML2FI/view?usp=drive_link
-AS733: https://drive.google.com/file/d/1UPQD69f7VLQTl-e3kI3jUH1ecM7lOhVO/view?usp=drive_link
-Ca-hepth: https://drive.google.com/file/d/1ebJ0e3PHX_KI3vmsYKFToi1kTdsAxQ8x/view?usp=drive_link
-Netscience: https://drive.google.com/file/d/1PJCkBiPKrLOA7_TTzKsKSnbnAR9F7EIY/view?usp=drive_link
+- AS-caida: https://drive.google.com/file/d/1ZOsB_nsFdwWK4FDbBEF_7S6DfYiML2FI/view?usp=drive_link
+- AS733: https://drive.google.com/file/d/1UPQD69f7VLQTl-e3kI3jUH1ecM7lOhVO/view?usp=drive_link
+- Ca-hepth: https://drive.google.com/file/d/1ebJ0e3PHX_KI3vmsYKFToi1kTdsAxQ8x/view?usp=drive_link
+- Netscience: https://drive.google.com/file/d/1PJCkBiPKrLOA7_TTzKsKSnbnAR9F7EIY/view?usp=drive_link
+
+# Execution Instructions
+
+## Compilation
+
+Compile both algorithms using GCC with optimization:
+
+```bash
+# Compile Algorithm 1 (Exact Flow-Based Approach)
+gcc -O3 daa1.cpp -o daa1
+
+# Compile Algorithm 2 (CoreExact Approach)
+gcc -O3 daa2.cpp -o daa2
+```
+
+## Running the Algorithms
+
+### Algorithm 1: Exact Flow-Based Approach
+
+Run the compiled executable with the dataset name (without the .txt extension):
+
+```bash
+./daa1 netscience
+./daa1 AS733
+./daa1 ca-hepth
+./daa1 AS-caida
+```
+
+### Algorithm 2: CoreExact Approach
+
+Run the compiled executable with the dataset name (with the .txt extension):
+
+```bash
+./daa2 netscience.txt
+./daa2 AS733.txt
+./daa2 ca-hepth.txt
+./daa2 AS-caida.txt
+```
+
+## Output
+
+Both algorithms will output:
+- The density of the identified densest subgraph
+- The vertices included in the densest subgraph
+- Execution time statistics
 
 ## Performance Highlights
 
